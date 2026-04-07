@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introduction to Testing Web Applications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<style>
+  :root {
+    --amber:  #f5a623;
+    --green:  #4ecb8d;
+    --purple: #a78bfa;
+    --blue:   #60a5fa;
+    --red:    #f87171;
+    --bg:     #0a0a0f;
+    --bg2:    #10101a;
+    --bg3:    #181824;
+    --border: #2a2a3a;
+    --text:   #e8e8f0;
+    --muted:  #8888a8;
+  }
+
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section { background: transparent; }
+
+  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
+  .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
+  .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
+  .reveal p  { font-size: .56em; line-height: 1.45; color: var(--text); }
+  .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
+  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
+                 border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+
+  /* ── slide chrome ── */
+  .slide-hdr {
+    display: flex; align-items: center; gap: .4em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .2em; margin-bottom: .3em;
+  }
+  .slide-hdr .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .42em; font-weight: 500;
+    color: var(--bg); background: var(--amber);
+    padding: .1em .4em; border-radius: 3px;
+    letter-spacing: .04em;
+  }
+  .slide-hdr h2 { margin: 0; font-size: .95em; }
+
+  /* ── two-column ── */
+  .cols   { display: grid; gap: .5em; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-6040 { grid-template-columns: 6fr 4fr; }
+  .cols-4060 { grid-template-columns: 4fr 6fr; }
+
+  /* ── cards ── */
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: .35em .6em;
+  }
+  .card.amber { border-left: 3px solid var(--amber); }
+  .card.green { border-left: 3px solid var(--green); }
+  .card.purple{ border-left: 3px solid var(--purple); }
+  .card.blue  { border-left: 3px solid var(--blue); }
+  .card.red   { border-left: 3px solid var(--red); }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; }
+  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card ul { margin: 0; padding-left: 1em; }
+  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+
+  /* ── table ── */
+  .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
+  .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
+                     padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
+  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+
+  /* ── accent spans ── */
+  .a  { color: var(--amber); font-weight: 600; }
+  .g  { color: var(--green); font-weight: 600; }
+  .p  { color: var(--purple); font-weight: 600; }
+  .b  { color: var(--blue); font-weight: 600; }
+  .r  { color: var(--red); font-weight: 600; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── SVG graph diagrams ── */
+  svg.diagram { display: block; margin: 0 auto; overflow: visible; }
+
+  /* ── pill badges ── */
+  .pill {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: .44em; padding: .08em .4em; border-radius: 99px;
+    border: 1px solid; margin: 0 .08em;
+  }
+  .pill.amber { color: var(--amber); border-color: var(--amber); }
+  .pill.green { color: var(--green); border-color: var(--green); }
+  .pill.purple{ color: var(--purple); border-color: var(--purple); }
+  .pill.blue  { color: var(--blue); border-color: var(--blue); }
+
+  /* ── footer — hidden ── */
+  .reveal .slide-footer { display: none; }
+  /* title slide special */
+  .title-slide h1 { font-size: 1.8em; }
+  .title-slide .subtitle {
+    font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em;
+  }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* reduce default margins */
+  .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
+  .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+<!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
+<section class="title-slide" data-background-color="#0a0a0f">
+  <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
+      TECHNICAL PRESENTATION
+    </div>
+    <h1>Introduction to Testing<br>Web Applications</h1>
+    <div class="subtitle">From Unit Tests to End-to-End &mdash; Building Confidence in Every Deploy</div>
+    <div style="width:60px; height:3px; background:var(--amber); margin-bottom:1.4em;"></div>
+    <div class="meta">Jest &middot; Supertest &middot; React Testing Library &middot; Playwright &middot; Cypress &middot; TDD &middot; CI/CD</div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 02 — AGENDA ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">02</span><h2>Agenda</h2></div>
+  <div class="cols cols-2">
+    <div class="card amber">
+      <h3>Foundations</h3>
+      <ul>
+        <li>Why test? Confidence &amp; regression prevention</li>
+        <li>The testing pyramid &amp; trade-offs</li>
+        <li>Unit testing with Jest</li>
+        <li>Testing async code</li>
+        <li>Mocking &amp; spying strategies</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>Integration &amp; API</h3>
+      <ul>
+        <li>Integration testing concepts</li>
+        <li>API testing with Supertest</li>
+        <li>Component testing with React Testing Library</li>
+        <li>Snapshot testing techniques</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>End-to-End</h3>
+      <ul>
+        <li>E2E testing with Playwright</li>
+        <li>E2E testing with Cypress</li>
+        <li>Performance &amp; load testing</li>
+        <li>Test-Driven Development</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>Production</h3>
+      <ul>
+        <li>Code coverage &amp; thresholds</li>
+        <li>CI/CD integration</li>
+        <li>Testing patterns &amp; anti-patterns</li>
+        <li>Summary &amp; next steps</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 03 — WHY TEST ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">03</span><h2>Why Test?</h2></div>
+  <div class="cols cols-6040">
+    <div>
+      <p>Testing is not optional overhead &mdash; it is a <span class="a">core engineering practice</span> that pays dividends at every stage of the software lifecycle. Without tests, every deployment is a gamble.</p>
+      <p>Teams with comprehensive test suites deploy <span class="g">more frequently</span>, recover <span class="g">faster from failures</span>, and spend <span class="g">less time debugging</span> production issues.</p>
+      <div class="card amber" style="margin-top:.3em;">
+        <h3>The Cost of Bugs</h3>
+        <ul>
+          <li>A bug caught in development costs <span class="a">1x</span></li>
+          <li>A bug caught in QA costs <span class="p">10x</span></li>
+          <li>A bug caught in production costs <span class="r">100x</span></li>
+          <li>Automated tests catch bugs at <span class="g">1x cost</span></li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3>Key Benefits</h3>
+        <ul>
+          <li><span class="a">Confidence</span> &mdash; deploy knowing nothing is broken</li>
+          <li><span class="g">Regression prevention</span> &mdash; bugs don't come back</li>
+          <li><span class="p">Living documentation</span> &mdash; tests describe behaviour</li>
+          <li><span class="b">Refactoring safety</span> &mdash; change code without fear</li>
+          <li><span class="r">Faster onboarding</span> &mdash; new devs read tests to learn</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Testing is NOT</h3>
+        <ul>
+          <li>A guarantee of zero bugs</li>
+          <li>A replacement for code review</li>
+          <li>Something only QA teams do</li>
+          <li>Worth skipping to "save time"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 04 — TESTING PYRAMID ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">04</span><h2>The Testing Pyramid</h2></div>
+  <p>The testing pyramid is a strategy for balancing <span class="a">speed</span>, <span class="g">cost</span>, and <span class="p">confidence</span>. More tests at the base, fewer at the top.</p>
+  <svg class="diagram" viewBox="0 0 900 280" width="820">
+    <!-- E2E tier -->
+    <polygon points="450,15 570,95 330,95" fill="#1a1a2a" stroke="#f87171" stroke-width="1.5"/>
+    <text x="450" y="70" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono,monospace" font-size="13" font-weight="500">E2E</text>
+    <!-- Integration tier -->
+    <polygon points="330,95 570,95 630,165 270,165" fill="#1a1a2a" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="450" y="140" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="14" font-weight="500">Integration</text>
+    <!-- Unit tier -->
+    <polygon points="270,165 630,165 720,250 180,250" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="450" y="218" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="16" font-weight="500">Unit Tests</text>
+    <!-- Labels right side -->
+    <text x="740" y="60" fill="#f87171" font-family="DM Sans,sans-serif" font-size="12">Slow, expensive, high confidence</text>
+    <text x="740" y="140" fill="#a78bfa" font-family="DM Sans,sans-serif" font-size="12">Moderate speed &amp; cost</text>
+    <text x="740" y="220" fill="#4ecb8d" font-family="DM Sans,sans-serif" font-size="12">Fast, cheap, many tests</text>
+    <!-- Labels left side -->
+    <text x="160" y="60" text-anchor="end" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="11">~5-10%</text>
+    <text x="160" y="140" text-anchor="end" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="11">~15-25%</text>
+    <text x="160" y="220" text-anchor="end" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="11">~65-80%</text>
+  </svg>
+  <div class="cols cols-3" style="margin-top:.2em;">
+    <div class="card green">
+      <h3>Unit Tests</h3>
+      <p>Test individual functions/classes in isolation. Run in milliseconds. Easiest to write and maintain. Mock external dependencies.</p>
+    </div>
+    <div class="card purple">
+      <h3>Integration Tests</h3>
+      <p>Test modules working together &mdash; API routes, database queries, middleware chains. Slower but catch wiring bugs unit tests miss.</p>
+    </div>
+    <div class="card red">
+      <h3>E2E Tests</h3>
+      <p>Test the full application from a user's perspective &mdash; real browser, real network. Slowest and most brittle, but highest confidence.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 05 — UNIT TESTING WITH JEST ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">05</span><h2>Unit Testing with Jest</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>describe / it / expect</h3></div>
+<pre><code class="language-javascript">// math.js
+function add(a, b) { return a + b; }
+function divide(a, b) {
+  if (b === 0) throw new Error('Division by zero');
+  return a / b;
+}
+module.exports = { add, divide };
+
+// math.test.js
+const { add, divide } = require('./math');
+
+describe('Math utilities', () =&gt; {
+  describe('add', () =&gt; {
+    it('adds two positive numbers', () =&gt; {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    it('handles negative numbers', () =&gt; {
+      expect(add(-1, -2)).toBe(-3);
+    });
+  });
+
+  describe('divide', () =&gt; {
+    it('divides correctly', () =&gt; {
+      expect(divide(10, 2)).toBe(5);
+    });
+
+    it('throws on division by zero', () =&gt; {
+      expect(() =&gt; divide(10, 0))
+        .toThrow('Division by zero');
+    });
+  });
+});</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>Common Matchers</h3></div>
+      <table>
+        <thead><tr><th>Matcher</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><code>toBe(val)</code></td><td>Strict equality (<code>===</code>)</td></tr>
+          <tr><td><code>toEqual(obj)</code></td><td>Deep equality (objects/arrays)</td></tr>
+          <tr><td><code>toBeTruthy()</code></td><td>Truthy check</td></tr>
+          <tr><td><code>toContain(item)</code></td><td>Array/string includes</td></tr>
+          <tr><td><code>toHaveLength(n)</code></td><td>Array/string length</td></tr>
+          <tr><td><code>toThrow(msg)</code></td><td>Error thrown</td></tr>
+          <tr><td><code>toMatch(/regex/)</code></td><td>String regex match</td></tr>
+          <tr><td><code>toHaveProperty(k)</code></td><td>Object has key</td></tr>
+          <tr><td><code>toBeNull()</code></td><td>Strict null check</td></tr>
+          <tr><td><code>toBeGreaterThan(n)</code></td><td>Numeric comparison</td></tr>
+        </tbody>
+      </table>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Setup &amp; Teardown</h3>
+<pre><code class="language-javascript">beforeAll(() =&gt; { /* once before all tests */ });
+afterAll(() =&gt;  { /* once after all tests  */ });
+beforeEach(() =&gt; { /* before each test */ });
+afterEach(() =&gt;  { /* after each test  */ });</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 06 — TESTING ASYNC CODE ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">06</span><h2>Testing Async Code</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>async/await (recommended)</h3></div>
+<pre><code class="language-javascript">// userService.js
+async function fetchUser(id) {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error('User not found');
+  return res.json();
+}
+
+// userService.test.js
+test('fetches user by ID', async () =&gt; {
+  const user = await fetchUser(1);
+  expect(user).toHaveProperty('name');
+  expect(user.id).toBe(1);
+});
+
+test('throws for missing user', async () =&gt; {
+  await expect(fetchUser(99999))
+    .rejects.toThrow('User not found');
+});</code></pre>
+      <div class="card green" style="margin-top:.2em;">
+        <h3>Promise-based</h3>
+<pre><code class="language-javascript">test('resolves user data', () =&gt; {
+  return fetchUser(1).then(user =&gt; {
+    expect(user.name).toBeDefined();
+  });
+});</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple"><h3>done callback (legacy)</h3></div>
+<pre><code class="language-javascript">test('calls back with data', (done) =&gt; {
+  fetchUserCallback(1, (err, user) =&gt; {
+    try {
+      expect(err).toBeNull();
+      expect(user.name).toBeDefined();
+      done();
+    } catch (e) {
+      done(e);
+    }
+  });
+});</code></pre>
+      <div class="card blue" style="margin-top:.3em;">
+        <h3>Testing Timers</h3>
+<pre><code class="language-javascript">jest.useFakeTimers();
+
+test('debounce waits before calling', () =&gt; {
+  const fn = jest.fn();
+  const debounced = debounce(fn, 500);
+
+  debounced();
+  expect(fn).not.toHaveBeenCalled();
+
+  jest.advanceTimersByTime(500);
+  expect(fn).toHaveBeenCalledTimes(1);
+});
+
+afterEach(() =&gt; jest.useRealTimers());</code></pre>
+      </div>
+      <div class="card red" style="margin-top:.2em;">
+        <h3>Common Pitfall</h3>
+        <p>Forgetting to <code>return</code> or <code>await</code> a promise in a test &mdash; Jest won't wait for it and the test passes even if the assertion would fail.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 07 — MOCKING & SPYING ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">07</span><h2>Mocking &amp; Spying</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>jest.fn() &mdash; manual mock</h3></div>
+<pre><code class="language-javascript">const callback = jest.fn();
+callback('hello');
+
+expect(callback).toHaveBeenCalledWith('hello');
+expect(callback).toHaveBeenCalledTimes(1);
+
+// Return values
+const getPrice = jest.fn()
+  .mockReturnValueOnce(9.99)
+  .mockReturnValueOnce(19.99);
+
+expect(getPrice()).toBe(9.99);
+expect(getPrice()).toBe(19.99);</code></pre>
+      <div class="card green" style="margin-top:.2em;">
+        <h3>jest.spyOn() &mdash; watch real methods</h3>
+<pre><code class="language-javascript">const spy = jest.spyOn(console, 'log');
+
+myFunction();
+
+expect(spy).toHaveBeenCalledWith('Starting...');
+spy.mockRestore(); // clean up</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple"><h3>jest.mock() &mdash; module mocks</h3></div>
+<pre><code class="language-javascript">// Mock entire module
+jest.mock('./database');
+const db = require('./database');
+
+db.findUser.mockResolvedValue({
+  id: 1, name: 'Alice'
+});
+
+test('returns user from DB', async () =&gt; {
+  const user = await getUser(1);
+  expect(user.name).toBe('Alice');
+  expect(db.findUser).toHaveBeenCalledWith(1);
+});</code></pre>
+      <div class="card blue" style="margin-top:.2em;">
+        <h3>Manual Mock File</h3>
+<pre><code class="language-javascript">// __mocks__/axios.js
+module.exports = {
+  get: jest.fn(() =&gt;
+    Promise.resolve({ data: {} })
+  ),
+  post: jest.fn(() =&gt;
+    Promise.resolve({ data: {} })
+  ),
+};</code></pre>
+      </div>
+      <div class="card red" style="margin-top:.2em;">
+        <h3>Dependency Injection</h3>
+        <p>Design functions to accept dependencies as parameters &mdash; makes mocking trivial without <code>jest.mock()</code>.</p>
+<pre><code class="language-javascript">// Easy to test: inject the DB
+function getUser(db, id) {
+  return db.findUser(id);
+}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 08 — INTEGRATION TESTING ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">08</span><h2>Integration Testing</h2></div>
+  <div class="cols cols-6040">
+    <div>
+      <p>Integration tests verify that <span class="a">multiple modules work together correctly</span>. They test the wiring between components &mdash; database access, middleware chains, and service interactions.</p>
+      <div class="card amber">
+        <h3>Database Integration Example</h3>
+<pre><code class="language-javascript">const { Pool } = require('pg');
+const { createUser, getUser } = require('./users');
+
+let pool;
+
+beforeAll(async () =&gt; {
+  pool = new Pool({
+    connectionString: process.env.TEST_DB_URL
+  });
+  await pool.query('BEGIN');
+});
+
+afterAll(async () =&gt; {
+  await pool.query('ROLLBACK');
+  await pool.end();
+});
+
+test('creates and retrieves a user', async () =&gt; {
+  const created = await createUser(pool, {
+    name: 'Alice', email: 'alice@test.com'
+  });
+
+  const found = await getUser(pool, created.id);
+
+  expect(found.name).toBe('Alice');
+  expect(found.email).toBe('alice@test.com');
+});</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3>What to Integration Test</h3>
+        <ul>
+          <li>API routes end-to-end (request &rarr; response)</li>
+          <li>Database queries with real data</li>
+          <li>Authentication &amp; authorisation flows</li>
+          <li>Middleware chains (validation, CORS, logging)</li>
+          <li>Third-party service interactions</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Test Database Strategies</h3>
+        <ul>
+          <li><span class="a">Transaction rollback</span> &mdash; wrap each test in a transaction</li>
+          <li><span class="g">Docker containers</span> &mdash; spin up a fresh DB per run</li>
+          <li><span class="p">In-memory DB</span> &mdash; SQLite for speed</li>
+          <li><span class="b">Seeding</span> &mdash; load known fixtures before tests</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:.3em;">
+        <h3>Unit vs Integration</h3>
+        <table>
+          <thead><tr><th>Unit</th><th>Integration</th></tr></thead>
+          <tbody>
+            <tr><td>Single function</td><td>Multiple modules</td></tr>
+            <tr><td>Mocked deps</td><td>Real deps</td></tr>
+            <tr><td>Milliseconds</td><td>Seconds</td></tr>
+            <tr><td>Precise errors</td><td>Wiring errors</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 09 — API TESTING WITH SUPERTEST ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">09</span><h2>API Testing with Supertest</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>Basic HTTP Assertions</h3></div>
+<pre><code class="language-javascript">const request = require('supertest');
+const app = require('./app');
+
+describe('GET /api/products', () =&gt; {
+  test('returns 200 and JSON array', async () =&gt; {
+    const res = await request(app)
+      .get('/api/products')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(res.body).toBeInstanceOf(Array);
+    expect(res.body.length).toBeGreaterThan(0);
+  });
+
+  test('filters by category', async () =&gt; {
+    const res = await request(app)
+      .get('/api/products?category=electronics')
+      .expect(200);
+
+    res.body.forEach(product =&gt; {
+      expect(product.category).toBe('electronics');
+    });
+  });
+});</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>POST with Auth Headers</h3></div>
+<pre><code class="language-javascript">describe('POST /api/products', () =&gt; {
+  const token = 'Bearer test-jwt-token';
+
+  test('creates product with valid auth', async () =&gt; {
+    const res = await request(app)
+      .post('/api/products')
+      .set('Authorization', token)
+      .send({
+        name: 'Widget',
+        price: 29.99,
+        category: 'electronics'
+      })
+      .expect(201);
+
+    expect(res.body.id).toBeDefined();
+    expect(res.body.name).toBe('Widget');
+  });
+
+  test('returns 401 without auth', async () =&gt; {
+    await request(app)
+      .post('/api/products')
+      .send({ name: 'Widget' })
+      .expect(401);
+  });
+
+  test('returns 400 for invalid body', async () =&gt; {
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', token)
+      .send({ name: '' })  // validation fails
+      .expect(400);
+  });
+});</code></pre>
+    </div>
+  </div>
+  <div class="card purple" style="margin-top:.2em;">
+    <h3>Tip: Export App Separately from Server</h3>
+    <p>Export your Express <code>app</code> without calling <code>.listen()</code>. Supertest binds to an ephemeral port internally. This avoids port conflicts when running tests in parallel.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 10 — COMPONENT TESTING ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">10</span><h2>Component Testing with React Testing Library</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>render, screen, queries</h3></div>
+<pre><code class="language-javascript">import { render, screen } from
+  '@testing-library/react';
+import UserProfile from './UserProfile';
+
+test('renders user name and email', () =&gt; {
+  render(&lt;UserProfile
+    name="Alice"
+    email="alice@example.com"
+  /&gt;);
+
+  expect(screen.getByText('Alice'))
+    .toBeInTheDocument();
+  expect(screen.getByText('alice@example.com'))
+    .toBeInTheDocument();
+});
+
+test('shows loading state', () =&gt; {
+  render(&lt;UserProfile loading={true} /&gt;);
+
+  expect(screen.getByRole('progressbar'))
+    .toBeInTheDocument();
+  expect(screen.queryByText('Alice'))
+    .not.toBeInTheDocument();
+});</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>User Interaction with userEvent</h3></div>
+<pre><code class="language-javascript">import userEvent from '@testing-library/user-event';
+import LoginForm from './LoginForm';
+
+test('submits login form', async () =&gt; {
+  const onSubmit = jest.fn();
+  const user = userEvent.setup();
+
+  render(&lt;LoginForm onSubmit={onSubmit} /&gt;);
+
+  await user.type(
+    screen.getByLabelText('Email'),
+    'alice@test.com'
+  );
+  await user.type(
+    screen.getByLabelText('Password'),
+    'secret123'
+  );
+  await user.click(
+    screen.getByRole('button', { name: /log in/i })
+  );
+
+  expect(onSubmit).toHaveBeenCalledWith({
+    email: 'alice@test.com',
+    password: 'secret123',
+  });
+});</code></pre>
+    </div>
+  </div>
+  <div class="cols cols-3" style="margin-top:.2em;">
+    <div class="card purple"><h3>Query Priority</h3><p><code>getByRole</code> &gt; <code>getByLabelText</code> &gt; <code>getByText</code> &gt; <code>getByTestId</code>. Prefer accessible queries &mdash; they test what users see.</p></div>
+    <div class="card blue"><h3>Async Queries</h3><p>Use <code>findBy*</code> for elements that appear after async operations. Uses <code>waitFor</code> under the hood with a default timeout.</p></div>
+    <div class="card red"><h3>Guiding Principle</h3><p>"The more your tests resemble the way your software is used, the more confidence they can give you." &mdash; Kent C. Dodds</p></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 11 — E2E PLAYWRIGHT ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">11</span><h2>E2E Testing with Playwright</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>Browser Automation</h3></div>
+<pre><code class="language-javascript">// tests/login.spec.js
+import { test, expect } from '@playwright/test';
+
+test('user can log in', async ({ page }) =&gt; {
+  await page.goto('/login');
+
+  await page.getByLabel('Email')
+    .fill('alice@test.com');
+  await page.getByLabel('Password')
+    .fill('secret123');
+  await page.getByRole('button', { name: 'Log in' })
+    .click();
+
+  // Wait for navigation
+  await expect(page).toHaveURL('/dashboard');
+  await expect(
+    page.getByText('Welcome, Alice')
+  ).toBeVisible();
+});
+
+test('shows error for bad credentials', async ({ page }) =&gt; {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('bad@test.com');
+  await page.getByLabel('Password').fill('wrong');
+  await page.getByRole('button', { name: 'Log in' })
+    .click();
+
+  await expect(
+    page.getByText('Invalid credentials')
+  ).toBeVisible();
+});</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>Fixtures &amp; Page Objects</h3></div>
+<pre><code class="language-javascript">// fixtures.js
+import { test as base } from '@playwright/test';
+
+class LoginPage {
+  constructor(page) { this.page = page; }
+
+  async login(email, password) {
+    await this.page.goto('/login');
+    await this.page.getByLabel('Email').fill(email);
+    await this.page.getByLabel('Password')
+      .fill(password);
+    await this.page.getByRole('button',
+      { name: 'Log in' }).click();
+  }
+}
+
+export const test = base.extend({
+  loginPage: async ({ page }, use) =&gt; {
+    await use(new LoginPage(page));
+  },
+});
+
+// Usage in tests
+test('dashboard loads', async ({ loginPage, page }) =&gt; {
+  await loginPage.login('alice@test.com', 'secret');
+  await expect(page).toHaveURL('/dashboard');
+});</code></pre>
+      <div class="card purple" style="margin-top:.2em;">
+        <h3>Key Features</h3>
+        <ul>
+          <li><span class="a">Multi-browser</span> &mdash; Chromium, Firefox, WebKit</li>
+          <li><span class="g">Auto-wait</span> &mdash; waits for elements to be actionable</li>
+          <li><span class="p">Trace viewer</span> &mdash; step-by-step debugging</li>
+          <li><span class="b">Parallel execution</span> &mdash; out of the box</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 12 — E2E CYPRESS ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">12</span><h2>E2E Testing with Cypress</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>cy Commands</h3></div>
+<pre><code class="language-javascript">// cypress/e2e/products.cy.js
+describe('Product page', () =&gt; {
+  beforeEach(() =&gt; {
+    cy.visit('/products');
+  });
+
+  it('displays product list', () =&gt; {
+    cy.get('[data-testid="product-card"]')
+      .should('have.length.greaterThan', 0);
+  });
+
+  it('filters by search', () =&gt; {
+    cy.get('[data-testid="search-input"]')
+      .type('laptop');
+
+    cy.get('[data-testid="product-card"]')
+      .each(($card) =&gt; {
+        cy.wrap($card)
+          .should('contain.text', 'laptop');
+      });
+  });
+
+  it('adds item to cart', () =&gt; {
+    cy.get('[data-testid="add-to-cart"]')
+      .first().click();
+    cy.get('[data-testid="cart-count"]')
+      .should('have.text', '1');
+  });
+});</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>Network Intercepts</h3></div>
+<pre><code class="language-javascript">it('handles API failure gracefully', () =&gt; {
+  cy.intercept('GET', '/api/products', {
+    statusCode: 500,
+    body: { error: 'Server error' }
+  }).as('getProducts');
+
+  cy.visit('/products');
+  cy.wait('@getProducts');
+
+  cy.get('[data-testid="error-message"]')
+    .should('contain', 'Something went wrong');
+});</code></pre>
+      <div class="card purple" style="margin-top:.2em;">
+        <h3>Custom Commands</h3>
+<pre><code class="language-javascript">// cypress/support/commands.js
+Cypress.Commands.add('login', (email, pw) =&gt; {
+  cy.session([email, pw], () =&gt; {
+    cy.request('POST', '/api/auth/login', {
+      email, password: pw
+    }).then(({ body }) =&gt; {
+      window.localStorage.setItem(
+        'token', body.token
+      );
+    });
+  });
+});
+
+// Usage
+beforeEach(() =&gt; cy.login('alice@test.com', 'pw'));</code></pre>
+      </div>
+      <div class="card blue" style="margin-top:.2em;">
+        <h3>Playwright vs Cypress</h3>
+        <table>
+          <thead><tr><th>Feature</th><th>Playwright</th><th>Cypress</th></tr></thead>
+          <tbody>
+            <tr><td>Browsers</td><td>All three</td><td>Chromium-focused</td></tr>
+            <tr><td>Language</td><td>JS/TS/Python/C#</td><td>JS/TS only</td></tr>
+            <tr><td>Tabs/windows</td><td>Yes</td><td>Limited</td></tr>
+            <tr><td>Dev UX</td><td>Good</td><td>Excellent</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 13 — TDD ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">13</span><h2>Test-Driven Development</h2></div>
+  <div class="cols cols-6040">
+    <div>
+      <p>TDD is a development workflow where you write a <span class="r">failing test first</span>, then write the <span class="g">minimum code to pass</span>, then <span class="p">refactor</span>. This cycle is called <span class="a">Red-Green-Refactor</span>.</p>
+      <svg class="diagram" viewBox="0 0 440 200" width="400">
+        <circle cx="100" cy="100" r="60" fill="none" stroke="#f87171" stroke-width="2"/>
+        <text x="100" y="95" text-anchor="middle" fill="#f87171" font-family="Playfair Display,serif" font-size="16" font-weight="700">RED</text>
+        <text x="100" y="115" text-anchor="middle" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="10">Write failing test</text>
+        <circle cx="340" cy="100" r="60" fill="none" stroke="#4ecb8d" stroke-width="2"/>
+        <text x="340" y="95" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="16" font-weight="700">GREEN</text>
+        <text x="340" y="115" text-anchor="middle" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="10">Make it pass</text>
+        <circle cx="220" cy="30" r="50" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <text x="220" y="27" text-anchor="middle" fill="#a78bfa" font-family="Playfair Display,serif" font-size="14" font-weight="700">REFACTOR</text>
+        <text x="220" y="43" text-anchor="middle" fill="#8888a8" font-family="DM Sans,sans-serif" font-size="10">Clean up</text>
+        <path d="M155,75 Q180,50 195,45" fill="none" stroke="#8888a8" stroke-width="1.2" marker-end="url(#arrowTDD)"/>
+        <path d="M250,45 Q270,55 290,75" fill="none" stroke="#8888a8" stroke-width="1.2" marker-end="url(#arrowTDD)"/>
+        <path d="M290,135 Q220,170 155,135" fill="none" stroke="#8888a8" stroke-width="1.2" marker-end="url(#arrowTDD)"/>
+        <defs><marker id="arrowTDD" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#8888a8"/></marker></defs>
+      </svg>
+      <div class="card amber" style="margin-top:.2em;">
+        <h3>Practical TDD Workflow</h3>
+<pre><code class="language-javascript">// 1. RED: write the test first
+test('validates email format', () =&gt; {
+  expect(isValidEmail('bad')).toBe(false);
+  expect(isValidEmail('a@b.com')).toBe(true);
+});
+
+// 2. GREEN: simplest implementation
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// 3. REFACTOR: improve without breaking tests</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3>When TDD Shines</h3>
+        <ul>
+          <li>Well-defined business logic &amp; algorithms</li>
+          <li>Bug fixes (write test that reproduces the bug)</li>
+          <li>API design &mdash; tests clarify the interface</li>
+          <li>Complex validation rules</li>
+          <li>Data transformations &amp; parsing</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>When TDD is Harder</h3>
+        <ul>
+          <li>Exploratory UI prototyping</li>
+          <li>Rapidly changing requirements</li>
+          <li>Heavy third-party integrations</li>
+          <li>Visual/CSS-focused work</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:.3em;">
+        <h3>TDD Benefits</h3>
+        <ul>
+          <li><span class="a">Better design</span> &mdash; testable code is modular code</li>
+          <li><span class="g">100% test coverage</span> from the start (for new code)</li>
+          <li><span class="p">Instant feedback loop</span> &mdash; catch issues immediately</li>
+          <li><span class="b">Confidence</span> &mdash; every line of code has a reason to exist</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 14 — CODE COVERAGE ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">14</span><h2>Code Coverage</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>What Coverage Measures</h3></div>
+      <table>
+        <thead><tr><th>Metric</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="a">Statement</span></td><td>% of statements executed</td></tr>
+          <tr><td><span class="g">Branch</span></td><td>% of if/else paths taken</td></tr>
+          <tr><td><span class="p">Function</span></td><td>% of functions called</td></tr>
+          <tr><td><span class="b">Line</span></td><td>% of lines executed</td></tr>
+        </tbody>
+      </table>
+      <div class="card green" style="margin-top:.3em;">
+        <h3>Running Coverage</h3>
+<pre><code class="language-bash"># Jest (built-in Istanbul)
+npx jest --coverage
+
+# Vitest
+npx vitest --coverage
+
+# c8 (native V8 coverage)
+npx c8 node my-script.js
+npx c8 report --reporter=html</code></pre>
+      </div>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Sample Output</h3>
+<pre><code class="language-text">------------|---------|----------|---------|
+File        | % Stmts | % Branch | % Funcs |
+------------|---------|----------|---------|
+math.js     |   100   |   85.71  |   100   |
+utils.js    |   92.3  |   75.00  |   100   |
+auth.js     |   78.5  |   60.00  |   83.3  |
+------------|---------|----------|---------|
+All files   |   89.2  |   72.41  |   94.1  |
+------------|---------|----------|---------|</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card blue"><h3>Configuring Thresholds</h3></div>
+<pre><code class="language-javascript">// jest.config.js
+module.exports = {
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      branches: 75,
+      functions: 80,
+      lines: 80,
+    },
+    './src/critical/': {
+      statements: 95,
+      branches: 90,
+    },
+  },
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/**/*.test.js',
+    '!src/index.js',
+  ],
+};</code></pre>
+      <div class="card red" style="margin-top:.3em;">
+        <h3>Coverage Pitfalls</h3>
+        <ul>
+          <li><span class="r">100% coverage does not mean zero bugs</span> &mdash; it means every line ran, not that every edge case was verified</li>
+          <li>Coverage without meaningful assertions is <span class="r">vanity metric</span></li>
+          <li><span class="a">Branch coverage</span> is more valuable than statement coverage</li>
+          <li>Don't chase 100% &mdash; aim for <span class="g">80-90%</span> with good assertions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 15 — SNAPSHOT TESTING ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">15</span><h2>Snapshot Testing</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>How Snapshots Work</h3></div>
+<pre><code class="language-javascript">import { render } from '@testing-library/react';
+import UserCard from './UserCard';
+
+test('renders correctly', () =&gt; {
+  const { container } = render(
+    &lt;UserCard name="Alice" role="admin" /&gt;
+  );
+
+  // First run: creates .snap file
+  // Next runs: compares against snapshot
+  expect(container).toMatchSnapshot();
+});
+
+// To update snapshots after intentional changes:
+// npx jest --updateSnapshot
+// or press 'u' in watch mode</code></pre>
+      <div class="card green" style="margin-top:.3em;">
+        <h3>Inline Snapshots</h3>
+<pre><code class="language-javascript">test('formats currency', () =&gt; {
+  expect(formatCurrency(1299))
+    .toMatchInlineSnapshot(`"$12.99"`);
+
+  expect(formatCurrency(0))
+    .toMatchInlineSnapshot(`"$0.00"`);
+});
+// Jest writes the expected value into the source</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple"><h3>When to Use Snapshots</h3></div>
+      <table>
+        <thead><tr><th>Good For</th><th>Bad For</th></tr></thead>
+        <tbody>
+          <tr><td>Serialisable output (JSON, HTML)</td><td>Frequently changing UI</td></tr>
+          <tr><td>API response shapes</td><td>Large DOM trees</td></tr>
+          <tr><td>Config objects</td><td>Replacing all other assertions</td></tr>
+          <tr><td>Error messages</td><td>Dynamic data (dates, IDs)</td></tr>
+        </tbody>
+      </table>
+      <div class="card red" style="margin-top:.3em;">
+        <h3>Snapshot Anti-Patterns</h3>
+        <ul>
+          <li><span class="r">Blindly updating</span> snapshots without reviewing the diff</li>
+          <li><span class="r">Huge snapshots</span> (1000+ lines) &mdash; nobody reviews them</li>
+          <li>Snapshotting <span class="r">entire pages</span> instead of specific components</li>
+          <li>Using snapshots as a <span class="r">lazy substitute</span> for explicit assertions</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:.3em;">
+        <h3>Property Matchers</h3>
+<pre><code class="language-javascript">test('user object shape', () =&gt; {
+  expect(createUser('Alice')).toMatchSnapshot({
+    id: expect.any(String),
+    createdAt: expect.any(Date),
+    // name: 'Alice' checked via snapshot
+  });
+});</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 16 — PERFORMANCE & LOAD TESTING ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">16</span><h2>Performance &amp; Load Testing</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>k6 &mdash; Load Testing</h3></div>
+<pre><code class="language-javascript">// load-test.js (run with: k6 run load-test.js)
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '30s', target: 50 },  // ramp up
+    { duration: '1m',  target: 50 },  // sustain
+    { duration: '10s', target: 0 },   // ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)&lt;500'], // 95% &lt; 500ms
+    http_req_failed: ['rate&lt;0.01'],   // &lt;1% errors
+  },
+};
+
+export default function () {
+  const res = http.get('http://localhost:3000/api');
+  check(res, {
+    'status 200': (r) =&gt; r.status === 200,
+    'body has data': (r) =&gt; r.json().data !== null,
+  });
+  sleep(1);
+}</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>Artillery &mdash; API Load Testing</h3></div>
+<pre><code class="language-yaml"># artillery-config.yml
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 20
+      name: "Sustained load"
+
+scenarios:
+  - name: "Browse products"
+    flow:
+      - get:
+          url: "/api/products"
+          expect:
+            - statusCode: 200
+      - think: 2
+      - get:
+          url: "/api/products/1"</code></pre>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Lighthouse CI</h3>
+<pre><code class="language-bash"># Install and run
+npm i -g @lhci/cli
+lhci autorun --config=lighthouserc.json
+
+# Assert performance budgets
+# performance &gt;= 90, accessibility &gt;= 95</code></pre>
+      </div>
+      <div class="card blue" style="margin-top:.2em;">
+        <h3>Core Web Vitals</h3>
+        <ul>
+          <li><span class="a">LCP</span> &mdash; Largest Contentful Paint &lt; 2.5s</li>
+          <li><span class="g">INP</span> &mdash; Interaction to Next Paint &lt; 200ms</li>
+          <li><span class="p">CLS</span> &mdash; Cumulative Layout Shift &lt; 0.1</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 17 — CI/CD INTEGRATION ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">17</span><h2>CI/CD Integration</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber"><h3>GitHub Actions Example</h3></div>
+<pre><code class="language-yaml"># .github/workflows/test.yml
+name: Test Suite
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+        ports: ['5432:5432']
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --coverage
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/</code></pre>
+    </div>
+    <div>
+      <div class="card green"><h3>Parallel Execution</h3></div>
+<pre><code class="language-yaml"># Split tests across shards
+jobs:
+  test:
+    strategy:
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
+    steps:
+      - run: npx jest --shard=${{ matrix.shard }}
+
+  e2e:
+    strategy:
+      matrix:
+        shard: [1/3, 2/3, 3/3]
+    steps:
+      - run: npx playwright test
+          --shard=${{ matrix.shard }}</code></pre>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Test Reporting</h3>
+        <ul>
+          <li><span class="a">JUnit XML</span> &mdash; universal CI format</li>
+          <li><span class="g">jest-junit</span> &mdash; Jest reporter for CI</li>
+          <li><span class="p">Coverage badges</span> &mdash; Codecov, Coveralls</li>
+          <li><span class="b">Playwright HTML report</span> &mdash; artifact upload</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:.3em;">
+        <h3>Best Practices</h3>
+        <ul>
+          <li>Run <span class="a">fast tests first</span> (lint &rarr; unit &rarr; integration &rarr; E2E)</li>
+          <li><span class="g">Fail fast</span> &mdash; stop pipeline on first failure</li>
+          <li>Cache <code>node_modules</code> and Playwright browsers</li>
+          <li>Use <span class="p">matrix builds</span> for multi-version testing</li>
+          <li>Require <span class="b">passing tests</span> for PR merge</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 18 — PATTERNS & ANTI-PATTERNS ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">18</span><h2>Testing Patterns &amp; Anti-Patterns</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card green"><h3>Patterns (Do This)</h3></div>
+      <div class="card green" style="margin-top:.2em;">
+        <h3>Arrange-Act-Assert (AAA)</h3>
+<pre><code class="language-javascript">test('calculates order total', () =&gt; {
+  // Arrange
+  const items = [
+    { price: 10, qty: 2 },
+    { price: 5,  qty: 3 },
+  ];
+
+  // Act
+  const total = calculateTotal(items);
+
+  // Assert
+  expect(total).toBe(35);
+});</code></pre>
+      </div>
+      <div class="card green" style="margin-top:.2em;">
+        <h3>Test Isolation</h3>
+        <ul>
+          <li>Each test is independent &mdash; no shared state</li>
+          <li>Tests can run in <span class="a">any order</span></li>
+          <li>Use <code>beforeEach</code> to reset, not <code>beforeAll</code></li>
+          <li>Clean up side effects in <code>afterEach</code></li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:.2em;">
+        <h3>Descriptive Test Names</h3>
+<pre><code class="language-javascript">// Bad
+test('works', () =&gt; { ... });
+
+// Good
+test('returns 404 when user ID does not exist',
+  () =&gt; { ... });</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card red"><h3>Anti-Patterns (Avoid This)</h3></div>
+      <div class="card red" style="margin-top:.2em;">
+        <h3>Testing Implementation Details</h3>
+<pre><code class="language-javascript">// BAD: tests internal state
+test('sets isLoading to true', () =&gt; {
+  const wrapper = shallow(&lt;App /&gt;);
+  wrapper.instance().fetchData();
+  expect(wrapper.state('isLoading')).toBe(true);
+});
+
+// GOOD: tests observable behaviour
+test('shows loading spinner', async () =&gt; {
+  render(&lt;App /&gt;);
+  expect(screen.getByRole('progressbar'))
+    .toBeInTheDocument();
+});</code></pre>
+      </div>
+      <div class="card red" style="margin-top:.2em;">
+        <h3>Flaky Tests</h3>
+        <ul>
+          <li>Tests that <span class="r">sometimes pass, sometimes fail</span></li>
+          <li>Causes: race conditions, shared state, time-dependent logic, network calls</li>
+          <li>Fix: mock time, isolate state, use <code>waitFor</code>, avoid <code>sleep</code></li>
+        </ul>
+      </div>
+      <div class="card red" style="margin-top:.2em;">
+        <h3>More Anti-Patterns</h3>
+        <ul>
+          <li><span class="r">No assertions</span> &mdash; test passes but verifies nothing</li>
+          <li><span class="r">Multiple concerns</span> &mdash; one test testing five things</li>
+          <li><span class="r">Conditional logic</span> in tests (<code>if</code>/<code>switch</code>)</li>
+          <li><span class="r">Ignoring failing tests</span> with <code>.skip</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 19 — SUMMARY ═══════════════════════════════ -->
+<section>
+  <div class="slide-hdr"><span class="tag">19</span><h2>Summary &amp; Next Steps</h2></div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3>Key Takeaways</h3>
+        <ul>
+          <li>The testing pyramid: <span class="g">many unit</span>, some integration, <span class="r">few E2E</span></li>
+          <li><span class="a">Jest</span> for unit tests &mdash; matchers, mocks, snapshots</li>
+          <li><span class="g">Supertest</span> for API integration testing</li>
+          <li><span class="p">React Testing Library</span> &mdash; test behaviour, not implementation</li>
+          <li><span class="b">Playwright</span> &amp; <span class="b">Cypress</span> for end-to-end browser testing</li>
+          <li><span class="a">TDD</span> &mdash; Red-Green-Refactor drives better design</li>
+          <li>Code coverage is a guide, not a goal &mdash; <span class="g">80-90%</span> is healthy</li>
+          <li>CI/CD integration makes testing automatic and reliable</li>
+          <li>Arrange-Act-Assert, test isolation, no flaky tests</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3>Recommended Reading</h3>
+        <ul>
+          <li><span class="a">Testing JavaScript</span> &mdash; Kent C. Dodds (testingjavascript.com)</li>
+          <li><span class="g">Jest Documentation</span> &mdash; jestjs.io</li>
+          <li><span class="p">Playwright Documentation</span> &mdash; playwright.dev</li>
+          <li><span class="b">Testing Library Docs</span> &mdash; testing-library.com</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:.3em;">
+        <h3>Try These</h3>
+        <ul>
+          <li>Add Jest unit tests to an existing project</li>
+          <li>Write Supertest integration tests for your API</li>
+          <li>Set up Playwright E2E tests with CI</li>
+          <li>Practice TDD on a small utility library</li>
+          <li>Configure coverage thresholds in your CI pipeline</li>
+          <li>Convert a flaky test into a reliable one</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center; margin-top:.5em; color:var(--muted); font-size:.5em;">
+    <span class="a">Thank you!</span> &mdash; Built with Reveal.js &middot; Single self-contained HTML file
+  </p>
+</section>
+
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/monokai.min.css">
+<script>
+Reveal.initialize({
+  hash: true,
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  controls: true,
+  progress: true,
+  center: false,
+  width: 1100,
+  height: 900,
+  margin: 0.01,
+  plugins: [RevealHighlight],
+  highlight: { theme: 'monokai' }
+});
+</script>
+</body>
+</html>
